@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Results - TrafficAI Pro{% endblock %}
+
+{% block content %}
+<div class="topbar">
+    <div>
+        <h1 class="page-title">
+            <i class="fas fa-chart-bar"></i> Analysis Results
+        </h1>
+        <p style="color: #64748b; margin-top: 0.5rem;">
+            {{ analysis.location.name }} - {{ analysis.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+        </p>
+    </div>
+    <div class="topbar-actions">
+        <a href="{{ url_for('home') }}" class="btn btn-outline">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Hidden data container for JavaScript -->
+<div id="analysisData" 
+     data-status="{{ analysis.status }}"
+     data-metrics="{{ analysis.metrics_data | tojson | forceescape }}"
+     style="display: none;">
+</div>
+
+{% if analysis.status == 'completed' %}
+<!-- Performance Metrics -->
+<div class="stats-grid">
+    <div class="stat-card primary">
+        <div class="stat-icon">
+            <i class="fas fa-road"></i>
+        </div>
+        <div class="stat-value">{{ analysis.location.num_lanes }}</div>
+        <div class="stat-label">Lanes Monitored</div>
+    </div>
+    
+    <div class="stat-card success">
+        <div class="stat-icon">
+            <i class="fas fa-film"></i>
+        </div>
+        <div class="stat-value" id="totalFrames">-</div>
+        <div class="stat-label">Frames Processed</div>
+    </div>
+    
+    <div class="stat-card warning">
+        <div class="stat-icon">
+            <i class="fas fa-car"></i>
+        </div>
+        <div class="stat-value" id="avgVehicles">-</div>
+        <div class="stat-label">Avg Vehicles/Frame</div>
+    </div>
+    
+    <div class="stat-card info">
+        <div class="stat-icon">
+            <i class="fas fa-tachometer-alt"></i>
+        </div>
+        <div class="stat-value" id="efficiency">-</div>
+        <div class="stat-label">Efficiency Score</div>
+    </div>
+</div>
+
+<!-- Video Output -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">
+            <i class="fas fa-video"></i> Optimized Traffic Video
+        </h2>
+        <a href="{{ url_for('static', filename=analysis.output_video_path.replace('static/', '')) }}" 
+           class="btn btn-primary" download>
+            <i class="fas fa-download"></i> Download Video
+        </a>
+    </div>
+    
+    <div style="position: relative; width: 100%; padding-bottom: 56.25%; background: #000; border-radius: 12px; overflow: hidden;">
+        <video controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+            <source src="{{ url_for('static', filename=analysis.output_video_path.replace('static/', '')) }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+    
+    <div class="alert alert-info" style="margin-top: 1.5rem;">
+        <i class="fas fa-info-circle"></i>
+        <span>Green signals indicate the active lane, red signals indicate waiting lanes. Signal duration adapts based on traffic density.</span>
+    </div>
+</div>
+
+<!-- Performance Graphs -->
+<div class="grid-2">
+    <div class="card">
+        <h3 class="card-title">
+            <i class="fas fa-chart-line"></i> Reward Over Time
+        </h3>
+        <img src="{{ url_for('static', filename=analysis.reward_graph_path.replace('static/', '')) }}" 
+             alt="Reward Graph" style="width: 100%; border-radius: 12px;">
+        <p style="color: #64748b; margin-top: 1rem; text-align: center; font-size: 0.9rem;">
+            Lower (more negative) values indicate better performance in reducing congestion
+        </p>
+    </div>
+    
+    <div class="card">
+        <h3 class="card-title">
+            <i class="fas fa-car"></i> Vehicle Count Per Lane
+        </h3>
+        <img src="{{ url_for('static', filename=analysis.count_graph_path.replace('static/', '')) }}" 
+             alt="Vehicle Count Graph" style="width: 100%; border-radius: 12px;">
+        <p style="color: #64748b; margin-top: 1rem; text-align: center; font-size: 0.9rem;">
+            Shows the number of vehicles detected in each lane throughout the analysis
+        </p>
+    </div>
+</div>
+
+<!-- AI Insights -->
+<div class="card" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+    <h2 style="color: var(--dark); margin-bottom: 1.5rem;">
+        <i class="fas fa-brain"></i> AI-Powered Insights
+    </h2>
+    
+    <div class="grid-3">
+        <div style="background: white; padding: 1.5rem; border-radius: 12px;">
+            <div style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;">
+                <i class="fas fa-robot"></i>
+            </div>
+            <h4 style="color: var(--dark); margin-bottom: 0.5rem;">Deep Q-Learning</h4>
+            <p style="color: #64748b; font-size: 0.9rem; line-height: 1.6;">
+                Double Deep Q-Network (DDQN) reinforcement learning algorithm dynamically optimizes signal timing based on real-time traffic conditions.
+            </p>
+        </div>
+        
+        <div style="background: white; padding: 1.5rem; border-radius: 12px;">
+            <div style="font-size: 2rem; color: var(--success); margin-bottom: 1rem;">
+                <i class="fas fa-eye"></i>
+            </div>
+            <h4 style="color: var(--dark); margin-bottom: 0.5rem;">Vehicle Detection</h4>
+            <p style="color: #64748b; font-size: 0.9rem; line-height: 1.6;">
+                YOLO11 deep learning model identifies cars, motorcycles, buses, trucks, and bicycles with high accuracy in real-time.
+            </p>
+        </div>
+        
+        <div style="background: white; padding: 1.5rem; border-radius: 12px;">
+            <div style="font-size: 2rem; color: var(--warning); margin-bottom: 1rem;">
+                <i class="fas fa-clock"></i>
+            </div>
+            <h4 style="color: var(--dark); margin-bottom: 0.5rem;">Adaptive Timing</h4>
+            <p style="color: #64748b; font-size: 0.9rem; line-height: 1.6;">
+                Signal durations automatically adjust from 3-10 seconds based on traffic density to minimize wait times and reduce congestion.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Download Section -->
+<div class="card" style="background: #e8f5e9;">
+    <h3 style="color: #2e7d32; margin-bottom: 1.5rem;">
+        <i class="fas fa-download"></i> Download Analysis Results
+    </h3>
+    
+    <div class="grid-3">
+        <a href="{{ url_for('static', filename=analysis.output_video_path.replace('static/', '')) }}" 
+           class="btn btn-success" download style="justify-content: center;">
+            <i class="fas fa-video"></i> Video File
+        </a>
+        <a href="{{ url_for('static', filename=analysis.reward_graph_path.replace('static/', '')) }}" 
+           class="btn btn-success" download style="justify-content: center;">
+            <i class="fas fa-chart-line"></i> Reward Graph
+        </a>
+        <a href="{{ url_for('static', filename=analysis.count_graph_path.replace('static/', '')) }}" 
+           class="btn btn-success" download style="justify-content: center;">
+            <i class="fas fa-chart-bar"></i> Count Graph
+        </a>
+    </div>
+</div>
+
+{% elif analysis.status == 'processing' %}
+<!-- Processing State -->
+<div class="card text-center" style="padding: 4rem;">
+    <div class="spinner" style="margin: 0 auto 2rem;"></div>
+    <h2 style="color: var(--dark); margin-bottom: 1rem;">Processing Analysis...</h2>
+    <p style="color: #64748b;">This may take several minutes depending on video length. Please check back shortly.</p>
+    <button class="btn btn-primary" style="margin-top: 2rem;" onclick="location.reload()">
+        <i class="fas fa-sync"></i> Refresh Status
+    </button>
+</div>
+
+{% else %}
+<!-- Failed State -->
+<div class="card text-center" style="padding: 4rem;">
+    <div style="font-size: 4rem; color: var(--danger); margin-bottom: 1rem;">
+        <i class="fas fa-exclamation-circle"></i>
+    </div>
+    <h2 style="color: var(--dark); margin-bottom: 1rem;">Analysis Failed</h2>
+    <p style="color: #64748b;">An error occurred during processing. Please try again.</p>
+    <a href="{{ url_for('signal_training') }}" class="btn btn-primary" style="margin-top: 2rem;">
+        <i class="fas fa-redo"></i> Start New Analysis
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Pure JavaScript - No Jinja2 mixed in
+document.addEventListener('DOMContentLoaded', function() {
+    // Get data from hidden div
+    const dataContainer = document.getElementById('analysisData');
+    if (!dataContainer) {
+        console.log('ℹ️ No analysis data container found');
+        return;
+    }
+    
+    const status = dataContainer.dataset.status;
+    const metricsJson = dataContainer.dataset.metrics;
+    
+    // Only process if completed
+    if (status !== 'completed') {
+        console.log('ℹ️ Analysis not completed yet');
+        return;
+    }
+    
+    // Parse and display metrics
+    try {
+        const data = JSON.parse(metricsJson);
+        
+        // Update total frames
+        const totalFramesEl = document.getElementById('totalFrames');
+        if (totalFramesEl && data.rewards && Array.isArray(data.rewards)) {
+            totalFramesEl.textContent = data.rewards.length.toLocaleString();
+        }
+        
+        // Update average vehicles
+        const avgVehiclesEl = document.getElementById('avgVehicles');
+        if (avgVehiclesEl && typeof data.avg_vehicles === 'number') {
+            avgVehiclesEl.textContent = data.avg_vehicles.toFixed(1);
+        }
+        
+        // Update efficiency
+        const efficiencyEl = document.getElementById('efficiency');
+        if (efficiencyEl && typeof data.efficiency === 'number') {
+            efficiencyEl.textContent = data.efficiency.toFixed(1) + '%';
+        }
+        
+        console.log('✅ Analysis metrics loaded successfully');
+        
+    } catch (error) {
+        console.error('❌ Error parsing metrics:', error);
+        
+        // Set fallback values
+        ['totalFrames', 'avgVehicles', 'efficiency'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = 'N/A';
+        });
+    }
+});
+</script>
+{% endblock %}

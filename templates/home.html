@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - TrafficAI Pro{% endblock %}
+
+{% block content %}
+<div class="topbar">
+    <h1 class="page-title">
+        <i class="fas fa-chart-line"></i> Dashboard
+    </h1>
+    <div class="topbar-actions">
+        <button class="notification-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+        </button>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-grid">
+    <div class="stat-card primary">
+        <div class="stat-icon">
+            <i class="fas fa-map-marked-alt"></i>
+        </div>
+        <div class="stat-value" id="totalLocations">0</div>
+        <div class="stat-label">Total Locations</div>
+    </div>
+    
+    <div class="stat-card success">
+        <div class="stat-icon">
+            <i class="fas fa-traffic-light"></i>
+        </div>
+        <div class="stat-value" id="totalSignals">0</div>
+        <div class="stat-label">Active Signals</div>
+    </div>
+    
+    <div class="stat-card warning">
+        <div class="stat-icon">
+            <i class="fas fa-chart-bar"></i>
+        </div>
+        <div class="stat-value" id="totalAnalyses">0</div>
+        <div class="stat-label">Total Analyses</div>
+    </div>
+    
+    <div class="stat-card info">
+        <div class="stat-icon">
+            <i class="fas fa-car"></i>
+        </div>
+        <div class="stat-value">98.5%</div>
+        <div class="stat-label">Avg Efficiency</div>
+    </div>
+</div>
+
+<!-- Active Signals -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">
+            <i class="fas fa-traffic-light"></i> Active Signals
+        </h2>
+        <a href="{{ url_for('signal_training') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Train New Signal
+        </a>
+    </div>
+    <div id="activeSignalsContainer">
+        <div class="flex-center" style="padding: 3rem;">
+            <div class="spinner"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Performance Charts -->
+<div class="grid-2">
+    <div class="card">
+        <h3 class="card-title">
+            <i class="fas fa-chart-line"></i> Efficiency Trend
+        </h3>
+        <div class="chart-container">
+            <canvas id="efficiencyChart" width="600" height="300"></canvas>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h3 class="card-title">
+            <i class="fas fa-car"></i> Vehicle Processing
+        </h3>
+        <div class="chart-container">
+            <canvas id="vehicleChart" width="600" height="300"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Analyses -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">
+            <i class="fas fa-history"></i> Recent Analyses
+        </h2>
+        <a href="{{ url_for('signal_training') }}" class="btn btn-outline">
+            View All
+        </a>
+    </div>
+    <div id="recentAnalysesContainer">
+        <div class="flex-center" style="padding: 3rem;">
+            <div class="spinner"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
