@@ -1,7 +1,7 @@
 Flask==2.3.2
 Flask-SQLAlchemy==3.0.5
 Werkzeug==2.3.6
-torch==2.2.1
+torch==2.9.0
 torchvision==0.15.2
 ultralytics==8.0.196
 opencv-python==4.8.0.76
