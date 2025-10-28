@@ -5,64 +5,606 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - TrafficAI Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --success: #10b981;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --text: #334155;
+            --text-light: #64748b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            overflow: hidden;
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .auth-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 3rem 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .auth-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.5rem;
+        }
+
+        .auth-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .auth-body {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.875rem;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 3rem;
+            border: 2px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-input.error {
+            border-color: var(--danger);
+        }
+
+        .form-input.success {
+            border-color: var(--success);
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .password-strength {
+            margin-top: 0.5rem;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .strength-fill {
+            height: 100%;
+            transition: all 0.3s ease;
+            width: 0%;
+        }
+
+        .strength-fill.weak {
+            background: var(--danger);
+            width: 33%;
+        }
+
+        .strength-fill.medium {
+            background: var(--warning);
+            width: 66%;
+        }
+
+        .strength-fill.strong {
+            background: var(--success);
+            width: 100%;
+        }
+
+        .strength-text {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            margin-top: 2px;
+        }
+
+        .checkbox-group label {
+            font-size: 0.875rem;
+            color: var(--text);
+            cursor: pointer;
+            line-height: 1.5;
+        }
+
+        .checkbox-group label a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .checkbox-group label a:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: var(--text-light);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-footer {
+            padding: 1.5rem 2rem;
+            background: var(--light);
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text);
+        }
+
+        .auth-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .spinner {
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .auth-header {
+                padding: 2rem 1.5rem;
+            }
+            
+            .auth-title {
+                font-size: 1.5rem;
+            }
+            
+            .auth-body {
+                padding: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <div class="auth-logo">
-                    <i class="fas fa-traffic-light" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
-                </div>
-                <h1 class="auth-title">Create Account</h1>
-                <p class="auth-subtitle">Join TrafficAI Pro to manage your traffic signals</p>
+        <div class="auth-header">
+            <div class="auth-icon">
+                <i class="fas fa-user-plus"></i>
             </div>
-            
-            <form id="registerForm" onsubmit="handleRegister(event)">
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Join TrafficAI Pro Today</p>
+        </div>
+
+        <div class="auth-body">
+            <div id="alertContainer"></div>
+
+            <form id="registerForm">
                 <div class="form-group">
-                    <label class="form-label" for="username">
-                        <i class="fas fa-user"></i> Username
-                    </label>
-                    <input type="text" class="form-control" id="username" name="username" 
-                           placeholder="Choose a username" required minlength="3">
+                    <label class="form-label" for="username">Username</label>
+                    <div class="input-group">
+                        <i class="input-icon fas fa-user"></i>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            class="form-input" 
+                            placeholder="Choose a username"
+                            required
+                        >
+                    </div>
+                    <div id="usernameError" class="error-message" style="display: none;"></div>
                 </div>
-                
+
                 <div class="form-group">
-                    <label class="form-label" for="email">
-                        <i class="fas fa-envelope"></i> Email
-                    </label>
-                    <input type="email" class="form-control" id="email" name="email" 
-                           placeholder="Enter your email" required>
+                    <label class="form-label" for="email">Email Address</label>
+                    <div class="input-group">
+                        <i class="input-icon fas fa-envelope"></i>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="form-input" 
+                            placeholder="you@example.com"
+                            required
+                        >
+                    </div>
+                    <div id="emailError" class="error-message" style="display: none;"></div>
                 </div>
-                
+
                 <div class="form-group">
-                    <label class="form-label" for="password">
-                        <i class="fas fa-lock"></i> Password
-                    </label>
-                    <input type="password" class="form-control" id="password" name="password" 
-                           placeholder="Create a password" required minlength="6">
+                    <label class="form-label" for="password">Password</label>
+                    <div class="input-group">
+                        <i class="input-icon fas fa-lock"></i>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-input" 
+                            placeholder="Create a strong password"
+                            required
+                        >
+                    </div>
+                    <div class="password-strength" id="passwordStrength" style="display: none;">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <div class="strength-text" id="strengthText"></div>
+                    </div>
                 </div>
-                
+
                 <div class="form-group">
-                    <label class="form-label" for="confirmPassword">
-                        <i class="fas fa-lock"></i> Confirm Password
-                    </label>
-                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" 
-                           placeholder="Confirm your password" required minlength="6">
+                    <label class="form-label" for="confirmPassword">Confirm Password</label>
+                    <div class="input-group">
+                        <i class="input-icon fas fa-lock"></i>
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            name="confirmPassword" 
+                            class="form-input" 
+                            placeholder="Re-enter your password"
+                            required
+                        >
+                    </div>
+                    <div id="confirmError" class="error-message" style="display: none;"></div>
                 </div>
-                
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
-                    <i class="fas fa-user-plus"></i> Create Account
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <label for="terms">
+                            I agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="registerBtn">
+                    <span id="btnText">Create Account</span>
                 </button>
             </form>
-            
-            <div class="auth-footer">
-                Already have an account? 
-                <a href="{{ url_for('login') }}">Sign in here</a>
-            </div>
+        </div>
+
+        <div class="auth-footer">
+            Already have an account? <a href="/login">Sign in</a>
         </div>
     </div>
-    
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <script>
+        (function() {
+            'use strict';
+
+            var registerForm = document.getElementById('registerForm');
+            var registerBtn = document.getElementById('registerBtn');
+            var btnText = document.getElementById('btnText');
+            var passwordInput = document.getElementById('password');
+            var confirmPasswordInput = document.getElementById('confirmPassword');
+
+            registerForm.addEventListener('submit', handleRegister);
+            passwordInput.addEventListener('input', checkPasswordStrength);
+            confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+
+            function handleRegister(e) {
+                e.preventDefault();
+                
+                var username = document.getElementById('username').value;
+                var email = document.getElementById('email').value;
+                var password = document.getElementById('password').value;
+                var confirmPassword = document.getElementById('confirmPassword').value;
+                var terms = document.getElementById('terms').checked;
+
+                // Validate
+                var isValid = true;
+
+                if (username.length < 3) {
+                    showFieldError('username', 'Username must be at least 3 characters');
+                    isValid = false;
+                }
+
+                if (!validateEmail(email)) {
+                    showFieldError('email', 'Please enter a valid email address');
+                    isValid = false;
+                }
+
+                if (password.length < 6) {
+                    showAlert('error', 'Password must be at least 6 characters');
+                    isValid = false;
+                }
+
+                if (password !== confirmPassword) {
+                    showFieldError('confirm', 'Passwords do not match');
+                    isValid = false;
+                }
+
+                if (!terms) {
+                    showAlert('error', 'Please accept the Terms of Service');
+                    isValid = false;
+                }
+
+                if (!isValid) return;
+
+                // Submit
+                registerBtn.disabled = true;
+                btnText.innerHTML = '<div class="spinner"></div>';
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/api/auth/register', true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+
+                xhr.onload = function() {
+                    registerBtn.disabled = false;
+                    btnText.textContent = 'Create Account';
+
+                    if (xhr.status === 201) {
+                        showAlert('success', 'Account created successfully! Redirecting...');
+                        
+                        setTimeout(function() {
+                            window.location.href = '/login';
+                        }, 1500);
+                    } else {
+                        var error = 'Registration failed. Please try again.';
+                        try {
+                            var errorData = JSON.parse(xhr.responseText);
+                            error = errorData.message || error;
+                        } catch (e) {}
+                        
+                        showAlert('error', error);
+                    }
+                };
+
+                xhr.onerror = function() {
+                    registerBtn.disabled = false;
+                    btnText.textContent = 'Create Account';
+                    showAlert('error', 'Connection error. Please try again.');
+                };
+
+                var data = {
+                    username: username,
+                    email: email,
+                    password: password
+                };
+
+                xhr.send(JSON.stringify(data));
+            }
+
+            function checkPasswordStrength() {
+                var password = passwordInput.value;
+                var strengthContainer = document.getElementById('passwordStrength');
+                var strengthFill = document.getElementById('strengthFill');
+                var strengthText = document.getElementById('strengthText');
+
+                if (password.length === 0) {
+                    strengthContainer.style.display = 'none';
+                    return;
+                }
+
+                strengthContainer.style.display = 'block';
+
+                var strength = 0;
+                if (password.length >= 8) strength++;
+                if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+                if (/\d/.test(password)) strength++;
+                if (/[^a-zA-Z0-9]/.test(password)) strength++;
+
+                strengthFill.className = 'strength-fill';
+                
+                if (strength <= 1) {
+                    strengthFill.classList.add('weak');
+                    strengthText.textContent = 'Weak password';
+                    strengthText.style.color = 'var(--danger)';
+                } else if (strength <= 2) {
+                    strengthFill.classList.add('medium');
+                    strengthText.textContent = 'Medium strength';
+                    strengthText.style.color = 'var(--warning)';
+                } else {
+                    strengthFill.classList.add('strong');
+                    strengthText.textContent = 'Strong password';
+                    strengthText.style.color = 'var(--success)';
+                }
+            }
+
+            function checkPasswordMatch() {
+                var password = passwordInput.value;
+                var confirmPassword = confirmPasswordInput.value;
+                var errorDiv = document.getElementById('confirmError');
+
+                if (confirmPassword.length === 0) {
+                    errorDiv.style.display = 'none';
+                    confirmPasswordInput.classList.remove('error', 'success');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    errorDiv.innerHTML = '<i class="fas fa-times-circle"></i> Passwords do not match';
+                    errorDiv.style.display = 'flex';
+                    confirmPasswordInput.classList.add('error');
+                    confirmPasswordInput.classList.remove('success');
+                } else {
+                    errorDiv.style.display = 'none';
+                    confirmPasswordInput.classList.remove('error');
+                    confirmPasswordInput.classList.add('success');
+                }
+            }
+
+            function validateEmail(email) {
+                var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+
+            function showFieldError(field, message) {
+                var errorDiv = document.getElementById(field + 'Error');
+                var input = document.getElementById(field === 'confirm' ? 'confirmPassword' : field);
+                
+                if (errorDiv) {
+                    errorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + message;
+                    errorDiv.style.display = 'flex';
+                }
+                
+                if (input) {
+                    input.classList.add('error');
+                }
+            }
+
+            function showAlert(type, message) {
+                var alertContainer = document.getElementById('alertContainer');
+                var alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+                var icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+
+                var alert = document.createElement('div');
+                alert.className = 'alert ' + alertClass;
+                alert.innerHTML = '<i class="fas ' + icon + '"></i><span>' + message + '</span>';
+
+                alertContainer.innerHTML = '';
+                alertContainer.appendChild(alert);
+
+                setTimeout(function() {
+                    alert.remove();
+                }, 5000);
+            }
+
+            // Clear errors on input
+            var inputs = document.querySelectorAll('.form-input');
+            for (var i = 0; i < inputs.length; i++) {
+                inputs[i].addEventListener('input', function() {
+                    this.classList.remove('error');
+                    var errorDiv = document.getElementById(this.id + 'Error');
+                    if (errorDiv) {
+                        errorDiv.style.display = 'none';
+                    }
+                });
+            }
+        })();
+    </script>
 </body>
 </html>

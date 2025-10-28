@@ -1,107 +1,636 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - TrafficAI Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{% block title %}Dashboard - TrafficAI Pro{% endblock %}
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --text: #334155;
+            --text-light: #64748b;
+        }
 
-{% block content %}
-<div class="topbar">
-    <h1 class="page-title">
-        <i class="fas fa-chart-line"></i> Dashboard
-    </h1>
-    <div class="topbar-actions">
-        <button class="notification-btn">
-            <i class="fas fa-bell"></i>
-            <span class="notification-badge">3</span>
-        </button>
-    </div>
-</div>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text);
+        }
 
-<!-- Stats Cards -->
-<div class="stats-grid">
-    <div class="stat-card primary">
-        <div class="stat-icon">
-            <i class="fas fa-map-marked-alt"></i>
-        </div>
-        <div class="stat-value" id="totalLocations">0</div>
-        <div class="stat-label">Total Locations</div>
-    </div>
-    
-    <div class="stat-card success">
-        <div class="stat-icon">
-            <i class="fas fa-traffic-light"></i>
-        </div>
-        <div class="stat-value" id="totalSignals">0</div>
-        <div class="stat-label">Active Signals</div>
-    </div>
-    
-    <div class="stat-card warning">
-        <div class="stat-icon">
-            <i class="fas fa-chart-bar"></i>
-        </div>
-        <div class="stat-value" id="totalAnalyses">0</div>
-        <div class="stat-label">Total Analyses</div>
-    </div>
-    
-    <div class="stat-card info">
-        <div class="stat-icon">
-            <i class="fas fa-car"></i>
-        </div>
-        <div class="stat-value">98.5%</div>
-        <div class="stat-label">Avg Efficiency</div>
-    </div>
-</div>
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
 
-<!-- Active Signals -->
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">
-            <i class="fas fa-traffic-light"></i> Active Signals
-        </h2>
-        <a href="{{ url_for('signal_training') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Train New Signal
-        </a>
-    </div>
-    <div id="activeSignalsContainer">
-        <div class="flex-center" style="padding: 3rem;">
-            <div class="spinner"></div>
-        </div>
-    </div>
-</div>
+        .topbar {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-<!-- Performance Charts -->
-<div class="grid-2">
-    <div class="card">
-        <h3 class="card-title">
-            <i class="fas fa-chart-line"></i> Efficiency Trend
-        </h3>
-        <div class="chart-container">
-            <canvas id="efficiencyChart" width="600" height="300"></canvas>
-        </div>
-    </div>
-    
-    <div class="card">
-        <h3 class="card-title">
-            <i class="fas fa-car"></i> Vehicle Processing
-        </h3>
-        <div class="chart-container">
-            <canvas id="vehicleChart" width="600" height="300"></canvas>
-        </div>
-    </div>
-</div>
+        .page-title {
+            font-size: 1.75rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
 
-<!-- Recent Analyses -->
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">
-            <i class="fas fa-history"></i> Recent Analyses
-        </h2>
-        <a href="{{ url_for('signal_training') }}" class="btn btn-outline">
-            View All
-        </a>
-    </div>
-    <div id="recentAnalysesContainer">
-        <div class="flex-center" style="padding: 3rem;">
-            <div class="spinner"></div>
+        .page-title i {
+            color: var(--primary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stat-card.primary .stat-icon {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+
+        .stat-card.success .stat-icon {
+            background: linear-gradient(135deg, var(--success), #059669);
+        }
+
+        .stat-card.warning .stat-icon {
+            background: linear-gradient(135deg, var(--warning), #d97706);
+        }
+
+        .stat-card.info .stat-icon {
+            background: linear-gradient(135deg, var(--info), #2563eb);
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: background 0.2s;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-item:hover {
+            background: var(--light);
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+        }
+
+        .activity-icon.primary {
+            background: var(--primary);
+        }
+
+        .activity-icon.success {
+            background: var(--success);
+        }
+
+        .activity-icon.warning {
+            background: var(--warning);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+        }
+
+        .spinner {
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .flex-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="topbar">
+            <h1 class="page-title">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </h1>
+            <a href="/signal-training" class="btn btn-primary">
+                <i class="fas fa-plus"></i> New Analysis
+            </a>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <div class="stat-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value" id="totalLocations">0</div>
+                    <div class="stat-label">Total Locations</div>
+                </div>
+            </div>
+            
+            <div class="stat-card success">
+                <div class="stat-icon">
+                    <i class="fas fa-traffic-light"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value" id="totalSignals">0</div>
+                    <div class="stat-label">Active Signals</div>
+                </div>
+            </div>
+            
+            <div class="stat-card warning">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value" id="totalAnalyses">0</div>
+                    <div class="stat-label">Total Analyses</div>
+                </div>
+            </div>
+            
+            <div class="stat-card info">
+                <div class="stat-icon">
+                    <i class="fas fa-car"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">98.5%</div>
+                    <div class="stat-label">Avg Efficiency</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="chart-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-chart-line"></i> Traffic Flow Trend
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="trafficChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-clock"></i> Signal Timing Efficiency
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="efficiencyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-history"></i> Recent Activity
+                </h2>
+            </div>
+            <div class="card-body">
+                <ul class="activity-list" id="activityList">
+                    <li class="flex-center">
+                        <div class="spinner"></div>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
-</div>
-{% endblock %}
+
+    <script>
+        (function() {
+            'use strict';
+
+            // Load dashboard data
+            function loadDashboard() {
+                loadStats();
+                loadCharts();
+                loadActivity();
+            }
+
+            function loadStats() {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/api/dashboard/stats', true);
+                
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        var data = JSON.parse(xhr.responseText);
+                        document.getElementById('totalLocations').textContent = data.locations || 0;
+                        document.getElementById('totalSignals').textContent = data.signals || 0;
+                        document.getElementById('totalAnalyses').textContent = data.analyses || 0;
+                    }
+                };
+                
+                xhr.send();
+            }
+
+            function loadCharts() {
+                createTrafficChart();
+                createEfficiencyChart();
+            }
+
+            function createTrafficChart() {
+                var canvas = document.getElementById('trafficChart');
+                var ctx = canvas.getContext('2d');
+                
+                // Sample data
+                var hours = ['6AM', '8AM', '10AM', '12PM', '2PM', '4PM', '6PM', '8PM'];
+                var vehicles = [120, 450, 380, 420, 390, 520, 480, 280];
+                
+                drawLineChart(ctx, canvas, hours, vehicles, '#4f46e5');
+            }
+
+            function createEfficiencyChart() {
+                var canvas = document.getElementById('efficiencyChart');
+                var ctx = canvas.getContext('2d');
+                
+                // Sample data
+                var signals = ['Signal A', 'Signal B', 'Signal C', 'Signal D'];
+                var efficiency = [95, 88, 92, 97];
+                
+                drawBarChart(ctx, canvas, signals, efficiency, '#10b981');
+            }
+
+            function drawLineChart(ctx, canvas, labels, data, color) {
+                var width = canvas.width = canvas.offsetWidth;
+                var height = canvas.height = canvas.offsetHeight;
+                var padding = 40;
+                var chartWidth = width - padding * 2;
+                var chartHeight = height - padding * 2;
+                
+                var max = Math.max.apply(null, data);
+                var step = chartWidth / (data.length - 1);
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, width, height);
+                
+                // Draw axes
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(padding, padding);
+                ctx.lineTo(padding, height - padding);
+                ctx.lineTo(width - padding, height - padding);
+                ctx.stroke();
+                
+                // Draw line
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                
+                for (var i = 0; i < data.length; i++) {
+                    var x = padding + i * step;
+                    var y = height - padding - (data[i] / max) * chartHeight;
+                    
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                
+                ctx.stroke();
+                
+                // Draw points
+                ctx.fillStyle = color;
+                for (var i = 0; i < data.length; i++) {
+                    var x = padding + i * step;
+                    var y = height - padding - (data[i] / max) * chartHeight;
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                // Draw labels
+                ctx.fillStyle = '#64748b';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                
+                for (var i = 0; i < labels.length; i++) {
+                    var x = padding + i * step;
+                    ctx.fillText(labels[i], x, height - padding + 20);
+                }
+            }
+
+            function drawBarChart(ctx, canvas, labels, data, color) {
+                var width = canvas.width = canvas.offsetWidth;
+                var height = canvas.height = canvas.offsetHeight;
+                var padding = 40;
+                var chartWidth = width - padding * 2;
+                var chartHeight = height - padding * 2;
+                
+                var max = 100;
+                var barWidth = chartWidth / data.length * 0.6;
+                var barSpacing = chartWidth / data.length;
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, width, height);
+                
+                // Draw axes
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(padding, padding);
+                ctx.lineTo(padding, height - padding);
+                ctx.lineTo(width - padding, height - padding);
+                ctx.stroke();
+                
+                // Draw bars
+                ctx.fillStyle = color;
+                for (var i = 0; i < data.length; i++) {
+                    var x = padding + i * barSpacing + (barSpacing - barWidth) / 2;
+                    var barHeight = (data[i] / max) * chartHeight;
+                    var y = height - padding - barHeight;
+                    
+                    ctx.fillRect(x, y, barWidth, barHeight);
+                    
+                    // Draw value on top
+                    ctx.fillStyle = '#334155';
+                    ctx.font = 'bold 14px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(data[i] + '%', x + barWidth / 2, y - 10);
+                    ctx.fillStyle = color;
+                }
+                
+                // Draw labels
+                ctx.fillStyle = '#64748b';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                
+                for (var i = 0; i < labels.length; i++) {
+                    var x = padding + i * barSpacing + barSpacing / 2;
+                    ctx.fillText(labels[i], x, height - padding + 20);
+                }
+            }
+
+            function loadActivity() {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/api/dashboard/activity', true);
+                
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        var activities = JSON.parse(xhr.responseText);
+                        renderActivity(activities);
+                    } else {
+                        renderDefaultActivity();
+                    }
+                };
+                
+                xhr.onerror = function() {
+                    renderDefaultActivity();
+                };
+                
+                xhr.send();
+            }
+
+            function renderActivity(activities) {
+                var list = document.getElementById('activityList');
+                list.innerHTML = '';
+                
+                if (activities.length === 0) {
+                    renderDefaultActivity();
+                    return;
+                }
+                
+                for (var i = 0; i < activities.length; i++) {
+                    var activity = activities[i];
+                    var li = document.createElement('li');
+                    li.className = 'activity-item';
+                    
+                    var iconClass = activity.type === 'analysis' ? 'primary' : 
+                                   activity.type === 'signal' ? 'success' : 'warning';
+                    var icon = activity.type === 'analysis' ? 'fa-chart-bar' :
+                              activity.type === 'signal' ? 'fa-traffic-light' : 'fa-map-marked-alt';
+                    
+                    li.innerHTML = '<div class="activity-icon ' + iconClass + '">' +
+                                  '<i class="fas ' + icon + '"></i></div>' +
+                                  '<div class="activity-content">' +
+                                  '<div class="activity-title">' + escapeHtml(activity.title) + '</div>' +
+                                  '<div class="activity-time">' + formatTime(activity.timestamp) + '</div></div>';
+                    
+                    list.appendChild(li);
+                }
+            }
+
+            function renderDefaultActivity() {
+                var list = document.getElementById('activityList');
+                list.innerHTML = '<li class="activity-item">' +
+                    '<div class="activity-icon primary"><i class="fas fa-info-circle"></i></div>' +
+                    '<div class="activity-content">' +
+                    '<div class="activity-title">No recent activity</div>' +
+                    '<div class="activity-time">Start by creating a new analysis</div></div></li>';
+            }
+
+            function formatTime(timestamp) {
+                if (!timestamp) return 'Just now';
+                var date = new Date(timestamp);
+                var now = new Date();
+                var diff = Math.floor((now - date) / 1000);
+                
+                if (diff < 60) return 'Just now';
+                if (diff < 3600) return Math.floor(diff / 60) + ' minutes ago';
+                if (diff < 86400) return Math.floor(diff / 3600) + ' hours ago';
+                return Math.floor(diff / 86400) + ' days ago';
+            }
+
+            function escapeHtml(text) {
+                var div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // Initialize
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', loadDashboard);
+            } else {
+                loadDashboard();
+            }
+        })();
+    </script>
+</body>
+</html>
