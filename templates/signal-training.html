@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signal Training - TrafficAI Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --text: #334155;
+            --text-light: #64748b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .topbar {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-title i {
+            color: var(--primary);
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: var(--light);
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary);
+            background: #ede9fe;
+        }
+
+        .file-upload.drag-over {
+            border-color: var(--primary);
+            background: #ede9fe;
+        }
+
+        .file-upload-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .file-upload-text {
+            color: var(--text);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-hint {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: var(--text-light);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #0891b2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-block {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: var(--light);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tr:hover {
+            background: var(--light);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .spinner {
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .flex-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: var(--dark);
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="topbar">
+            <h1 class="page-title">
+                <i class="fas fa-brain"></i> Signal Training & Analysis
+            </h1>
+        </div>
+
+        <div class="grid-2col">
+            <!-- Location Management -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-map-marker-alt"></i> Manage Locations
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form id="locationForm">
+                        <div class="form-group">
+                            <label class="form-label">Location Name</label>
+                            <input type="text" class="form-input" name="name" placeholder="e.g., Main St & 5th Ave" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Address</label>
+                            <input type="text" class="form-input" name="address" placeholder="Full address">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Number of Lanes</label>
+                            <input type="number" class="form-input" name="num_lanes" min="1" max="8" value="4" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-plus"></i> Add Location
+                        </button>
+                    </form>
+                    
+                    <div style="margin-top: 2rem;">
+                        <h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--dark);">Your Locations</h3>
+                        <div id="locationsList">
+                            <div class="flex-center">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Analysis -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-video"></i> Video Analysis
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Select Location</label>
+                        <select class="form-select" id="analysisLocation" required>
+                            <option value="">Choose a location...</option>
+                        </select>
+                    </div>
+                    
+                    <div id="videoUploadsContainer">
+                        <div class="form-group">
+                            <label class="form-label">Upload Videos (one per lane)</label>
+                            <div style="color: var(--text-light); font-size: 0.875rem; margin-bottom: 1rem;">
+                                <i class="fas fa-info-circle"></i> Select a location first to see video upload fields
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-success btn-block" id="startAnalysisBtn" disabled>
+                        <i class="fas fa-play"></i> Start Analysis
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Analyses -->
+        <div class="card" style="margin-top: 1.5rem;">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-history"></i> Recent Analyses
+                </h2>
+            </div>
+            <div class="card-body">
+                <div id="analysesContainer">
+                    <div class="flex-center">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            var currentLocationId = null;
+            var selectedFiles = {};
+            var currentLocation = null;
+
+            // Initialize
+            function init() {
+                setupEventListeners();
+                loadLocations();
+                loadAnalyses();
+            }
+
+            function setupEventListeners() {
+                // Location form
+                document.getElementById('locationForm').addEventListener('submit', handleLocationSubmit);
+                
+                // Location select change
+                document.getElementById('analysisLocation').addEventListener('change', handleLocationChange);
+                
+                // Start analysis
+                document.getElementById('startAnalysisBtn').addEventListener('click', startAnalysis);
+            }
+            
+            function handleLocationChange(e) {
+                var locationId = e.target.value;
+                if (!locationId) {
+                    document.getElementById('videoUploadsContainer').innerHTML = 
+                        '<div class="form-group"><label class="form-label">Upload Videos (one per lane)</label>' +
+                        '<div style="color: var(--text-light); font-size: 0.875rem; margin-bottom: 1rem;">' +
+                        '<i class="fas fa-info-circle"></i> Select a location first to see video upload fields</div></div>';
+                    document.getElementById('startAnalysisBtn').disabled = true;
+                    return;
+                }
+                
+                // Find location details
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/api/locations', true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        var locations = JSON.parse(xhr.responseText);
+                        currentLocation = locations.find(function(loc) { return loc.id == locationId; });
+                        if (currentLocation) {
+                            createVideoUploadFields(currentLocation.num_lanes);
+                        }
+                    }
+                };
+                xhr.send();
+            }
+            
+            function createVideoUploadFields(numLanes) {
+                selectedFiles = {};
+                var html = '<div class="form-group">';
+                html += '<label class="form-label">Upload Videos (one per lane)</label>';
+                html += '<div style="color: var(--text-light); font-size: 0.875rem; margin-bottom: 1rem;">';
+                html += '<i class="fas fa-info-circle"></i> Please upload ' + numLanes + ' video file(s), one for each lane</div>';
+                
+                for (var i = 1; i <= numLanes; i++) {
+                    html += '<div class="file-upload" data-lane="' + i + '" style="margin-bottom: 1rem;">';
+                    html += '<div class="file-upload-icon"><i class="fas fa-video"></i></div>';
+                    html += '<div class="file-upload-text"><strong>Lane ' + i + ' Video</strong></div>';
+                    html += '<div class="file-upload-hint">Click to upload MP4, AVI, MOV (Max 500MB)</div>';
+                    html += '<input type="file" class="file-input lane-video-input" data-lane="' + i + '" accept="video/*">';
+                    html += '<div class="file-name-display" id="fileName_' + i + '" style="display: none; margin-top: 0.5rem; color: var(--success);">';
+                    html += '<i class="fas fa-check-circle"></i> <span class="file-name-text"></span></div>';
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+                document.getElementById('videoUploadsContainer').innerHTML = html;
+                
+                // Attach event listeners to new file inputs
+                var fileUploads = document.querySelectorAll('.file-upload');
+                fileUploads.forEach(function(zone) {
+                    var lane = zone.getAttribute('data-lane');
+                    var input = zone.querySelector('.lane-video-input');
+                    
+                    zone.addEventListener('click', function() {
+                        input.click();
+                    });
+                    
+                    input.addEventListener('change', function(e) {
+                        handleLaneFileSelect(lane, e.target.files[0]);
+                    });
+                    
+                    zone.addEventListener('dragover', function(e) {
+                        e.preventDefault();
+                        zone.classList.add('drag-over');
+                    });
+                    
+                    zone.addEventListener('dragleave', function() {
+                        zone.classList.remove('drag-over');
+                    });
+                    
+                    zone.addEventListener('drop', function(e) {
+                        e.preventDefault();
+                        zone.classList.remove('drag-over');
+                        if (e.dataTransfer.files.length) {
+                            handleLaneFileSelect(lane, e.dataTransfer.files[0]);
+                        }
+                    });
+                });
+                
+                checkAllVideosUploaded();
+            }
+            
+            function handleLaneFileSelect(lane, file) {
+                if (file) {
+                    selectedFiles[lane] = file;
+                    var fileNameDiv = document.getElementById('fileName_' + lane);
+                    var fileNameText = fileNameDiv.querySelector('.file-name-text');
+                    fileNameText.textContent = file.name;
+                    fileNameDiv.style.display = 'block';
+                    checkAllVideosUploaded();
+                }
+            }
+            
+            function checkAllVideosUploaded() {
+                if (!currentLocation) return;
+                var allUploaded = true;
+                for (var i = 1; i <= currentLocation.num_lanes; i++) {
+                    if (!selectedFiles[i]) {
+                        allUploaded = false;
+                        break;
+                    }
+                }
+                document.getElementById('startAnalysisBtn').disabled = !allUploaded;
+            }
+
+            function handleLocationSubmit(e) {
+                e.preventDefault();
+                var form = e.target;
+                var formData = new FormData(form);
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/api/locations', true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                
+                xhr.onload = function() {
+                    if (xhr.status === 201) {
+                        var response = JSON.parse(xhr.responseText);
+                        showAlert('success', 'Location added successfully!');
+                        form.reset();
+                        loadLocations();
+                    } else {
+                        showAlert('error', 'Failed to add location');
+                    }
+                };
+                
+                var data = {
+                    name: formData.get('name'),
+                    address: formData.get('address'),
+                    num_lanes: parseInt(formData.get('num_lanes'))
+                };
+                
+                xhr.send(JSON.stringify(data));
+            }
+
+            function loadLocations() {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/api/locations', true);
+                
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        var locations = JSON.parse(xhr.responseText);
+                        renderLocations(locations);
+                        populateLocationSelect(locations);
+                    }
+                };
+                
+                xhr.send();
+            }
+
+            function renderLocations(locations) {
+                var container = document.getElementById('locationsList');
+                
+                if (locations.length === 0) {
+                    container.innerHTML = '<div class="empty-state">' +
+                        '<i class="fas fa-map-marked-alt"></i>' +
+                        '<p>No locations yet. Add one above.</p></div>';
+                    return;
+                }
+                
+                var html = '<table class="table"><tbody>';
+                
+                for (var i = 0; i < locations.length; i++) {
+                    var loc = locations[i];
+                    html += '<tr>' +
+                        '<td>' +
+                        '<strong>' + escapeHtml(loc.name) + '</strong><br>' +
+                        '<small style="color: var(--text-light);">' + loc.num_lanes + ' lanes</small>' +
+                        '</td>' +
+                        '<td style="text-align: right;">' +
+                        '<button class="btn btn-danger" onclick="deleteLocation(' + loc.id + ')">' +
+                        '<i class="fas fa-trash"></i></button>' +
+                        '</td></tr>';
+                }
+                
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            }
+
+            function populateLocationSelect(locations) {
+                var select = document.getElementById('analysisLocation');
+                select.innerHTML = '<option value="">Choose a location...</option>';
+                
+                for (var i = 0; i < locations.length; i++) {
+                    var option = document.createElement('option');
+                    option.value = locations[i].id;
+                    option.textContent = locations[i].name;
+                    select.appendChild(option);
+                }
+            }
+
+            function handleFileSelect() {
+                var fileInput = document.getElementById('videoFile');
+                var fileName = document.getElementById('fileName');
+                var fileNameText = document.getElementById('fileNameText');
+                
+                if (fileInput.files.length > 0) {
+                    selectedFile = fileInput.files[0];
+                    fileNameText.textContent = selectedFile.name;
+                    fileName.style.display = 'block';
+                }
+            }
+
+            function startAnalysis() {
+                var locationId = document.getElementById('analysisLocation').value;
+                
+                if (!locationId) {
+                    showAlert('error', 'Please select a location');
+                    return;
+                }
+                
+                if (!currentLocation) {
+                    showAlert('error', 'Location not found');
+                    return;
+                }
+                
+                // Check if all videos are uploaded
+                var allUploaded = true;
+                for (var i = 1; i <= currentLocation.num_lanes; i++) {
+                    if (!selectedFiles[i]) {
+                        allUploaded = false;
+                        break;
+                    }
+                }
+                
+                if (!allUploaded) {
+                    showAlert('error', 'Please upload videos for all ' + currentLocation.num_lanes + ' lanes');
+                    return;
+                }
+                
+                var formData = new FormData();
+                formData.append('location_id', locationId);
+                
+                // Append all video files with proper naming
+                for (var i = 1; i <= currentLocation.num_lanes; i++) {
+                    formData.append('video_lane_' + i, selectedFiles[i]);
+                }
+                
+                var btn = document.getElementById('startAnalysisBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/api/analyses', true);
+                
+                xhr.onload = function() {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-play"></i> Start Analysis';
+                    
+                    if (xhr.status === 201) {
+                        var response = JSON.parse(xhr.responseText);
+                        showAlert('success', 'Analysis started successfully!');
+                        setTimeout(function() {
+                            window.location.href = '/analysis/' + response.id;
+                        }, 1500);
+                    } else {
+                        var errorMsg = 'Analysis failed';
+                        try {
+                            var errorData = JSON.parse(xhr.responseText);
+                            errorMsg = errorData.error || errorMsg;
+                        } catch(e) {}
+                        showAlert('error', errorMsg);
+                    }
+                };
+                
+                xhr.onerror = function() {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-play"></i> Start Analysis';
+                    showAlert('error', 'Analysis failed');
+                };
+                
+                xhr.send(formData);
+            }
+
+            function loadAnalyses() {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/api/analyses?limit=10', true);
+                
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        var analyses = JSON.parse(xhr.responseText);
+                        renderAnalyses(analyses);
+                    }
+                };
+                
+                xhr.send();
+            }
+
+            function renderAnalyses(analyses) {
+                var container = document.getElementById('analysesContainer');
+                
+                if (analyses.length === 0) {
+                    container.innerHTML = '<div class="empty-state">' +
+                        '<i class="fas fa-chart-bar"></i>' +
+                        '<p>No analyses yet. Start one above.</p></div>';
+                    return;
+                }
+                
+                var html = '<table class="table">' +
+                    '<thead><tr>' +
+                    '<th>Location</th>' +
+                    '<th>Date</th>' +
+                    '<th>Status</th>' +
+                    '<th>Actions</th>' +
+                    '</tr></thead><tbody>';
+                
+                for (var i = 0; i < analyses.length; i++) {
+                    var analysis = analyses[i];
+                    var statusClass = analysis.status === 'completed' ? 'badge-success' :
+                                     analysis.status === 'processing' ? 'badge-warning' : 'badge-danger';
+                    
+                    html += '<tr>' +
+                        '<td>' + escapeHtml(analysis.location_name) + '</td>' +
+                        '<td>' + formatDate(analysis.created_at) + '</td>' +
+                        '<td><span class="badge ' + statusClass + '">' + analysis.status + '</span></td>' +
+                        '<td>' +
+                        '<a href="/analysis/' + analysis.id + '" class="btn btn-secondary" style="margin-right: 0.5rem;">' +
+                        '<i class="fas fa-eye"></i> View</a>' +
+                        '<button class="btn btn-danger" onclick="deleteAnalysis(' + analysis.id + ')">' +
+                        '<i class="fas fa-trash"></i> Delete</button>' +
+                        '</td>' +
+                        '</tr>';
+                }
+                
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            }
+
+            function showAlert(type, message) {
+                var alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+                var icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+                
+                var alert = document.createElement('div');
+                alert.className = 'alert ' + alertClass;
+                alert.innerHTML = '<i class="fas ' + icon + '"></i>' + message;
+                
+                document.querySelector('.container').insertBefore(alert, document.querySelector('.container').firstChild);
+                
+                setTimeout(function() {
+                    alert.remove();
+                }, 3000);
+            }
+
+            function formatDate(dateString) {
+                var date = new Date(dateString);
+                return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+            }
+
+            function escapeHtml(text) {
+                var div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            window.deleteLocation = function(id) {
+                if (!confirm('Are you sure you want to delete this location?')) {
+                    return;
+                }
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('DELETE', '/api/locations/' + id, true);
+                
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        showAlert('success', 'Location deleted');
+                        loadLocations();
+                    } else {
+                        showAlert('error', 'Failed to delete location');
+                    }
+                };
+                
+                xhr.send();
+            };
+
+            window.deleteAnalysis = function(id) {
+                if (!confirm('Are you sure you want to delete this analysis? This will remove the analysis results and processed video.')) {
+                    return;
+                }
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('DELETE', '/api/analyses/' + id, true);
+                
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        showAlert('success', 'Analysis deleted successfully');
+                        loadAnalyses();
+                    } else {
+                        showAlert('error', 'Failed to delete analysis');
+                    }
+                };
+                
+                xhr.onerror = function() {
+                    showAlert('error', 'Network error occurred');
+                };
+                
+                xhr.send();
+            };
+
+            // Initialize on load
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+</html>
